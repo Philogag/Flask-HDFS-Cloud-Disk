@@ -1,0 +1,32 @@
+@baseUrl = http://127.0.0.1:5000/api
+
+#### Shake hand
+GET {{baseUrl}}/hello
+
+#### Login
+POST {{baseUrl}}/auth/login
+Content-Type: application/json
+
+{
+    "username": "philogag",
+    "password": "1234567"
+}
+
+#### Check Login
+GET {{baseUrl}}/auth/check
+
+#### Logout
+Get {{baseUrl}}/auth/logout
+
+#### Regist
+POST {{baseUrl}}/auth/regist
+Content-Type: application/json
+
+{
+    "username": "philogag",
+    "password": "123456",
+    "password_confirm": "123456",
+    "data": {
+        "desc": "Any other things can put on 'data'."
+    }
+}
