@@ -16,3 +16,10 @@ MONGO_DB = {
     "PASSWORD":'passwd',
     "DB":'cloud_disk',
 }
+
+# HDFS 设置
+HDFS_HOST = [
+    "192.168.10.5:50070",
+]
+HADOOP_USER_NAME='root'
+HDFS_HOME = '/cloud' # hdfs中的根目录

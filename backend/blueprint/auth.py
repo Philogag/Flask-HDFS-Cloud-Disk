@@ -1,8 +1,10 @@
 from flask import Blueprint, current_app, request
 from flask_login import login_required, LoginManager, UserMixin, login_user, logout_user
+from bson.objectid import ObjectId
 
-from util.api_code import CodeResponse
+from util.api_code import CodeResponse, CodeResponseError
 from util.mongodb import db
+import util.hdfs as hdfs
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 User = db.User
@@ -10,22 +12,23 @@ Floder = db.Floder
 
 ## Login Module ##
 class SessionUser(UserMixin):
-    aes_key = ''
-    curr_path = ''
-    def __init__(self, username, user_home):
+    def __init__(self, userobj):
         super().__init__()
-        self.username = username
+        self.uid = str(userobj['_id'])
+        try:
+            self.curr_path = userobj['data']['curr_path']
+        except KeyError:
+            self.curr_path = '/'
 
     def get_id(self):
-        return self.username
+        return self.uid
 
 login_manager = LoginManager()
 login_manager.init_app(current_app)
 
 @login_manager.user_loader
-def load_user(username):
-    return SessionUser(username)
-
+def load_user(user_id):
+    return SessionUser(User.find_one({"_id": ObjectId(user_id)}))
 ## Urls ##
 
 @auth.route('/check', methods=['GET', ])
@@ -40,7 +43,8 @@ def login():
     userobj = User.find_one({"username": userlogin['username']})
     if userobj:
         if userobj['password'] == userlogin['password']:
-            login_user(SessionUser(userlogin['username']))
+            login_user(SessionUser(userobj))
+            hdfs.makehome(userobj['_id'])
             return CodeResponse(200, "Login successfully.")
         else:
             return CodeResponse(403.2, 'Password dose not match.')
@@ -62,8 +66,14 @@ def register():
         clean_data[k] = userreg[k]
     
     User.insert_one(clean_data)
+    userobj = User.find_one({"username": userreg['username']})
+    try:
+        hdfs.makehome(userobj['_id'])
+    except CodeResponseError as e:
+        User.delete_one(userobj) # regist failed, remove from db
+        raise e
 
-    login_user(SessionUser(userreg['username']))
+    login_user(SessionUser(userobj))
 
     return CodeResponse(200, 'Regist successfully.')
 

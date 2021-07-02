@@ -10,9 +10,13 @@ from flask_session import Session
 from util.mongodb import mongo, db
 app.config['SESSION_TYPE'] = 'mongodb'
 app.config['SESSION_MONGODB'] = mongo
-app.config['SESSION_MONGODB_DB'] = 'session'
+app.config['SESSION_MONGODB_DB'] = app.config['MONGO_DB']['DB']
 app.config['SESSION_KEY_PREFIX'] = 'session:'
 Session(app)
+
+## HDFS Hello ##
+import util.hdfs as hdfs
+hdfs.hello()
 
 ## Root ##
 @app.route('/api/hello', methods=['GET', ])
