@@ -2,14 +2,17 @@ from flask import Blueprint, current_app, request
 from flask_login import login_required, LoginManager, UserMixin, login_user, logout_user
 
 from util.api_code import CodeResponse
-from util.mongoutil import db
+from util.mongodb import db
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
 
 User = db.User
+Floder = db.Floder
 
 ## Login Module ##
 class SessionUser(UserMixin):
-    def __init__(self, username):
+    aes_key = ''
+    curr_path = ''
+    def __init__(self, username, user_home):
         super().__init__()
         self.username = username
 
@@ -57,7 +60,8 @@ def register():
     keys = ['username', "password", "data"]
     for k in keys:
         clean_data[k] = userreg[k]
-    User.insert(clean_data)
+    
+    User.insert_one(clean_data)
 
     login_user(SessionUser(userreg['username']))
 
