@@ -5,6 +5,9 @@ import os
 SECRET_KEY = 'asgwesvrery]p'
 HASH_SALT="qwwgawegxdf+w36_" # 16位加密用于密码哈希
 
+# 文件(夹)名黑名单字符
+BANNED_CHARSET = """/\:*?"<>|"""
+
 # 登陆设置
 PERMANENT_SESSION_LIFETIME = timedelta(days=1) # 登录过期时间 
 REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True # 自动刷新时长

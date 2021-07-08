@@ -7,9 +7,22 @@ POST {{baseUrl}}/auth/login
 Content-Type: application/json
 
 {
-    "username": "user1",
+    "username": "philogag",
     "password": "123456"
 }
 
 #### Check Login
 GET {{baseUrl}}/auth/check
+
+#### List Dir
+GET {{baseUrl}}/fs/list
+Cookie: current_path_id=60e6e52c0a9a80ba7867e331
+
+#### Make Dir
+GET {{baseUrl}}/fs/mkdir?name=test
+Cookie: current_path_id=60e6e52c0a9a80ba7867e331
+
+
+#### CD
+GET {{baseUrl}}/fs/cd?id=60e6ea32bffd7b9c16bc75a8
+Cookie: current_path_id=60e6e52c0a9a80ba7867e331

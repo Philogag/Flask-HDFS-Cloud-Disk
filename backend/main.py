@@ -29,11 +29,15 @@ def api_hello():
     return jsonify({'code': 200, 'msg': "hello"})
 
 ## Modules ##
-from blueprint.auth import auth
 from blueprint.view import view
+
+from blueprint.auth import auth
+from blueprint.file import file
 modules = [
+    view,
+
     auth,
-    view
+    file,
 ]
 
 for m in modules:

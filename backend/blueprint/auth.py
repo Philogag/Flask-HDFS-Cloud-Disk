@@ -4,8 +4,8 @@ from flask_login import login_required, LoginManager, UserMixin, login_user, log
 from util.api_code import CodeResponse, CodeResponseError
 import util.hdfs as hdfs
 
-from model.User import DbUser as User
-from model.File import Floder
+from model.User import User
+from model.File import Folder
 from datetime import datetime
 
 auth = Blueprint('auth', __name__, url_prefix='/api/auth')
@@ -51,17 +51,17 @@ def login():
             response = jsonify({
                 "code": 200,
                 "msg": "Login successfully",
-                "user": userobj, 
+                "info": userobj.get_info(), 
             })
             current_path_id = request.cookies.get('current_path_id')
-            current_floder = None
+            current_folder = None
             try:
-                current_floder = Floder.objects.get(id=current_path_id)
-                if current_floder.owner.id != current_user.uid:
+                current_folder = Folder.objects.get(id=current_path_id)
+                if current_folder.owner.id != current_user.obj.id:
                     raise "Permission denied."
-            except BaseException:
-                current_floder = Floder.objects(owner=current_user.obj, name='~').first()
-            response.set_cookie('current_path_id', current_floder.id)
+            except BaseException as e:
+                current_folder = Folder.objects(owner=current_user.obj, name='~').first()
+            response.set_cookie('current_path_id', str(current_folder.id))
             return response
         else:
             return CodeResponse(403.2, 'Password dose not match.')
@@ -91,14 +91,14 @@ def register():
         # User.delete_one(userobj) # regist failed, remove from db
         raise e
     
-    floder = Floder(owner=userobj, name="~", update_time=datetime.now()).save()
+    folder = Folder(owner=userobj, name="~", update_time=datetime.now()).save()
     login_user(SessionUser(userobj))
     response = jsonify({
                 "code": 200,
                 "msg": "Regist successfully.",
-                # "user": userobj, 
+                "info": userobj.get_info(), 
             })
-    response.set_cookie("current_path_id", floder.id)
+    response.set_cookie("current_path_id", folder.id)
     return response
 
 @auth.route('/logout', methods=['GET', ])
