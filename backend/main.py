@@ -25,8 +25,10 @@ def api_hello():
 
 ## Modules ##
 from blueprint.auth import auth
+from blueprint.view import view
 modules = [
-    auth
+    auth,
+    view
 ]
 
 for m in modules:
