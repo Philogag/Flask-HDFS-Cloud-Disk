@@ -7,10 +7,15 @@ app.config.from_pyfile('config.py')
 
 ## Session on DB ##
 from flask_session import Session
-from util.mongodb import mongo, db
+from pymongo import MongoClient
+from model.db import db
+
+__mongo_settings_copy = app.config['MONGODB_SETTINGS'].copy()
+del __mongo_settings_copy['db']
+del __mongo_settings_copy['authentication_source']
 app.config['SESSION_TYPE'] = 'mongodb'
-app.config['SESSION_MONGODB'] = mongo
-app.config['SESSION_MONGODB_DB'] = app.config['MONGO_DB']['DB']
+app.config['SESSION_MONGODB'] = MongoClient(**__mongo_settings_copy)
+app.config['SESSION_MONGODB_DB'] = app.config['MONGODB_SETTINGS']['db']
 app.config['SESSION_KEY_PREFIX'] = 'session:'
 Session(app)
 

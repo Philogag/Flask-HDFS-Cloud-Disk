@@ -3,18 +3,21 @@ import os
 
 #
 SECRET_KEY = 'asgwesvrery]p'
+HASH_SALT="qwwgawegxdf+w36_" # 16位加密用于密码哈希
 
 # 登陆设置
 PERMANENT_SESSION_LIFETIME = timedelta(days=1) # 登录过期时间 
 REMEMBER_COOKIE_REFRESH_EACH_REQUEST = True # 自动刷新时长
 
 # 数据库配置
-MONGO_DB = {
-    "HOST": '192.168.10.5',
-    "PORT": 27017,
-    "USER": 'root',
-    "PASSWORD":'passwd',
-    "DB":'cloud_disk',
+MONGODB_SETTINGS = {
+    "db": 'cloud_disk',
+    'host': '192.168.10.5',
+    'port': 27017,
+    'connect': False,
+    'username': 'root',
+    'password': 'passwd',
+    "authentication_source":'admin',
 }
 
 # HDFS 设置
