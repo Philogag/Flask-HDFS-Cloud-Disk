@@ -64,9 +64,9 @@ def login():
             response.set_cookie('current_path_id', str(current_folder.id))
             return response
         else:
-            return CodeResponse(403.2, 'Password dose not match.')
+            return CodeResponse(406.00002, 'Password dose not match.')
     except User.DoesNotExist:
-        return CodeResponse(403.1, 'User not found.')
+        return CodeResponse(406.00001, 'User not found.')
 
 @auth.route('/regist', methods=['POST'])
 def register():
@@ -74,9 +74,9 @@ def register():
     print(userreg)
 
     if User.objects(username=userreg['username']).count() > 0:
-        return CodeResponse(403.1, 'User has been registered.')
+        return CodeResponse(406.00003, 'User has been registered.')
     if userreg['password'] != userreg['password_confirm']:
-        return CodeResponse(403.2, 'Confirm password dose not the same.')
+        return CodeResponse(406.00004, 'Confirm password dose not the same.')
 
     userobj = User(
         username=userreg['username'],
