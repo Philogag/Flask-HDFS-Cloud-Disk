@@ -75,7 +75,7 @@ def register():
 
     if User.objects(username=userreg['username']).count() > 0:
         return CodeResponse(406.00003, 'User has been registered.')
-    if userreg['password'] != userreg['password_confirm']:
+    if userreg['password'] != userreg['password2']:
         return CodeResponse(406.00004, 'Confirm password dose not the same.')
 
     userobj = User(

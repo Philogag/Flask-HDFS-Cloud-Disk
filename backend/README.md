@@ -2,7 +2,22 @@
 
 ## 目录
 
-[TOC]
+- [Flask 后端](#flask-后端)
+    - [目录](#目录)
+    - [RESTful API](#restful-api)
+        - [GET /hello](#get-hello)
+        - [Auth](#auth)
+            - [状态码概览](#状态码概览)
+            - [POST /auth/login](#post-authlogin)
+            - [GET /auth/check](#get-authcheck)
+            - [GET /auth/logout](#get-authlogout)
+            - [POST /auth/regist](#post-authregist)
+        - [FileSystem](#filesystem)
+            - [状态码概览](#状态码概览-1)
+            - [GET /fs/list](#get-fslist)
+            - [GET /fs/refresh](#get-fsrefresh)
+            - [GET /fs/mkdir?name=\<name\>](#get-fsmkdirnamename)
+            - [GET /fs/cd?id=\<id\>](#get-fscdidid)
 
 ---
 
@@ -18,7 +33,7 @@
 
 具体值定义见下。
 
-
+---
 
 #### GET /hello
 
@@ -28,12 +43,14 @@
 | ----------- | ------- |
 | 200         | success |
 
-```
+```json
 {
   "code": 200,
   "msg": "hello"
 }
 ```
+
+---
 
 ### Auth
 
@@ -51,7 +68,7 @@
 #### POST /auth/login
 
 登录
-```
+```http
 POST /auth/login
 Content-Type: application/json
 
@@ -61,10 +78,16 @@ Content-Type: application/json
 }
 ```
 
-```
+```json
 {
-  "code": 403,
-  "msg": "User not found."
+  "code": 200,
+  "info": {
+    "id": "xxxxxxxx",
+    "last_login": "Thu, 08 Jul 2021 20:59:05 GMT",
+    "regist_time": "Thu, 08 Jul 2021 19:44:44 GMT",
+    "username": "philogag"
+  },
+  "msg": "Login successfully"
 }
 ```
 
@@ -82,29 +105,35 @@ Content-Type: application/json
 
 注册
 
-```
+```http
 POST /auth/regist
 Content-Type: application/json
 
 {
-    "username": "philogag",
-    "password": "123456",
-    "password-confirm": "123456",
-    "data": {
-        "desc": "Any other things can put on 'data'."
-    }
+  "username": "philogag",
+  "password": "123456",
+  "password2": "123456"
 }
 ```
 
-
-
-
+```json
+{
+  "code": 200,
+  "info": {
+    "id": "xxxxxxx",
+    "last_login": "Thu, 08 Jul 2021 20:59:05 GMT",
+    "regist_time": "Thu, 08 Jul 2021 19:44:44 GMT",
+    "username": "philogag"
+  },
+  "msg": "Regist successfully."
+}
+```
 
 ---
 
 ### FileSystem
 
-通过 cookie 中的 <p id="current_path_id">current_path_id</p>  字段保存 当前所在文件夹
+通过 cookie 中的 <t id="current_path_id">current_path_id</t>  字段保存 当前所在文件夹
 
 登录时自动检查 **cookie** 中的 **旧id** 是否有权限。若无权限（即用户不匹配），则自动设置为 **用户根目录 `~`**
 
@@ -130,15 +159,15 @@ Content-Type: application/json
 
 二者等价，获取 <a href="#current_path_id">current_path_id</a> 的详细信息，包括到根的路径，子目录，子文件夹等
 
-```
+```json
 {
   "code": "200",
   "detial": {
-    "id": "60e6ea32bffd7b9c16bc75a8",
+    "id": "xxxxx",
     "name": "test",
     "root": [
       {
-        "id": "60e6e52c0a9a80ba7867e331",
+        "id": "xxxxx",
         "name": "~",
         "size": 2,
         "update_time": "Thu, 08 Jul 2021 19:44:44 GMT"
@@ -173,8 +202,15 @@ Content-Type: application/json
 在 <a href="#current_path_id">current_path_id</a> 下新建文件夹，
 
 检查非空且不包含非法字符，默认为 `/\:*?"<>\|` 
-
 可通过 BANNED_CHARSET 进行配置
+
+```json
+{
+  "code": "200",
+  "msg": "ok",
+  "new_id": "xxxxx"  // 新文件夹id
+}
+```
 
 
 
