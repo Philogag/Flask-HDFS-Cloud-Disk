@@ -1,4 +1,6 @@
 from enum import Enum
+from datetime import datetime
+
 from model.db import db
 from model.User import User
 
@@ -23,9 +25,9 @@ class Folder(db.Document):
         current = self.parent_floder.fetch()
         ret = []
         while current and current.name != "~":
-            ret.append(current.get_info())
+            ret.append(current)
             current = current.parent_floder.fetch()
-        ret.append(current.get_info())  # This is ~
+        ret.append(current)  # This is ~
         ret.reverse()
         return ret
 
@@ -37,7 +39,7 @@ class Folder(db.Document):
             "name": self.name,
             "update_time": self.update_time,
             "size": self.size,
-            "root": self.walk_to_root(),
+            "root": [ f.get_info() for f in self.walk_to_root() ],
             "sons": {
                 "folders": [ f.get_info() for f in list(son_folders) ],
                 "files": [ f.get_info() for f in list(son_files) ]
@@ -51,6 +53,11 @@ class Folder(db.Document):
             "update_time": self.update_time,
             "size": self.size,
         }
+    
+    def add_size(self, size):
+        self.size = self.size + size
+        self.update_time = datetime.now()
+        return self
 
 
 class File(db.Document):
@@ -66,6 +73,12 @@ class File(db.Document):
     parent_floder = db.LazyReferenceField(Folder, required=True)
     owner = db.LazyReferenceField(User, required=True)
     
+    def get_root(self):
+        parent = self.parent_floder.fetch()
+        root = parent.get_root()
+        root.append(parent)
+        return root
+
     def get_info(self):
         return {
             "id": str(self.id),

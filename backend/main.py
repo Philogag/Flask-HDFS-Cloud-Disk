@@ -32,12 +32,12 @@ def api_hello():
 from blueprint.view import view
 
 from blueprint.auth import auth
-from blueprint.file import file
+from blueprint.file import fs
 modules = [
     view,
 
     auth,
-    file,
+    fs,
 ]
 
 for m in modules:
