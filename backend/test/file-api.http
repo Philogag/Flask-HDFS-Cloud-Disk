@@ -19,10 +19,27 @@ GET {{baseUrl}}/fs/list
 Cookie: current_path_id=60e6e52c0a9a80ba7867e331
 
 #### Make Dir
-GET {{baseUrl}}/fs/mkdir?name=test
+GET {{baseUrl}}/fs/mkdir?name=t1
 Cookie: current_path_id=60e6e52c0a9a80ba7867e331
 
 
 #### CD
-GET {{baseUrl}}/fs/cd?id=60e6ea32bffd7b9c16bc75a8
+GET {{baseUrl}}/fs/cd?id=60e82ed04c6a2b1bd5f49a3a
 Cookie: current_path_id=60e6e52c0a9a80ba7867e331
+
+#### 
+GET {{baseUrl}}/fs/cd?id=60e6e52c0a9a80ba7867e331
+Cookie: current_path_id=60e82ed04c6a2b1bd5f49a3a
+
+#### Rename
+GET {{baseUrl}}/fs/rename?type=folder&id=60e82ed04c6a2b1bd5f49a3a&name=~
+Cookie: current_path_id=60e6e52c0a9a80ba7867e331
+
+#### Move
+GET {{baseUrl}}/fs/move?type=folder&id=60e82ed04c6a2b1bd5f49a3a&target=60e8327030a9b7a7a29675cd
+Cookie: current_path_id=60e6e52c0a9a80ba7867e331
+
+
+
+#### Delete
+GET {{baseUrl}}/fs/delete?type=folder&id=60e8327030a9b7a7a29675cd

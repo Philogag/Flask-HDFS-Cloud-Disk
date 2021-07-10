@@ -60,7 +60,7 @@ def login():
                 if current_folder.owner.id != current_user.obj.id:
                     raise "Permission denied."
             except BaseException as e:
-                current_folder = Folder.objects(owner=current_user.obj, name='~').first()
+                current_folder = Folder.objects(owner=current_user.obj, isroot=True).first()
             response.set_cookie('current_path_id', str(current_folder.id))
             return response
         else:
@@ -83,22 +83,21 @@ def register():
         password=userreg['password'],
         reg_time=datetime.now(),
         last_login=datetime.now()
-    )
-    userobj.save()
+    ).save()
     try:
         hdfs.makehome(userobj.id)
     except CodeResponseError as e:
         # User.delete_one(userobj) # regist failed, remove from db
         raise e
     
-    folder = Folder(owner=userobj, name="~", update_time=datetime.now()).save()
+    folder = Folder(owner=userobj, name="~", update_time=datetime.now(), isroot=True).save()
     login_user(SessionUser(userobj))
     response = jsonify({
                 "code": 200,
                 "msg": "Regist successfully.",
                 "info": userobj.get_info(), 
             })
-    response.set_cookie("current_path_id", folder.id)
+    response.set_cookie("current_path_id", str(folder.id))
     return response
 
 @auth.route('/logout', methods=['GET', ])
@@ -106,3 +105,4 @@ def register():
 def logout():
     logout_user()
     return CodeResponse(200, "User is no longer login now.")
+    

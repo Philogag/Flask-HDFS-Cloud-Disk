@@ -4,9 +4,14 @@ import os
 #
 SECRET_KEY = 'asgwesvrery]p'
 HASH_SALT="qwwgawegxdf+w36_" # 16位加密用于密码哈希
-
+AES_KEY_LENGTH = 64
+MAX_CHUNK_SIZE = 4 * 1024 * 1024 # B   = 4MB
 # 文件(夹)名黑名单字符
 BANNED_CHARSET = """/\:*?"<>|"""
+
+# 回收站保存时长
+# RECYCLE_BIN_TTL = 7 * 24 * 3600 # seconds
+RECYCLE_BIN_TTL = 120
 
 # 登陆设置
 PERMANENT_SESSION_LIFETIME = timedelta(days=1) # 登录过期时间 
