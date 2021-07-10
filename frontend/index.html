@@ -4,7 +4,8 @@
 
     <!-- 资源文件不要添加前置\ -->
     <script src="static\jquery\jquery.min.js" ></script>
-
+    <script src="static\md5.min.js" ></script>
+    <script src="static\fileio.js" ></script>
 </head>
 
 <body>
@@ -14,6 +15,90 @@
     <script>
         $("#test").html("Static file load success.");
     </script>
+
+    <hr>
+    <h3>登录</h3>
+    <form id="login">
+        <label>Username</label>
+        <input id="login_username" name="username" value="philogag">
+        <br>
+
+        <label>Password</label>
+        <input id="login_password" name="password" value="123456">
+        <br>
+    </form>
+    <button id="login_btn">Login</button>
+    <script>
+        $("#login_btn").on("click", () => {
+            var fields = $('#login').serializeArray();
+            var obj = {};
+            $.each(fields, function(index, field) {
+                obj[field.name] = field.value;
+            })
+            console.log(JSON.stringify(obj))
+            $.ajax({
+                url : "/api/auth/login",
+                data : JSON.stringify(obj),
+                type : 'post',
+                async: false,
+                contentType: 'application/json',
+                dataType: 'JSON',
+                success : function(data) {
+                    console.log(data)
+                }
+            });
+        })
+    </script>
+    <hr>
+    <h3>List</h3>
+    <button id="list_btn">List</button>
+    <script>
+        $("#list_btn").on("click", () => {
+            $.ajax({
+                url : "/api/fs/list",
+                type : 'get',
+                async: false,
+                success : function(data) {
+                    console.log(data)
+                }
+            });
+        })
+    </script>
+    <hr>
+    <h3>文件上传测试</h3>
+
+    <form id="upload_test">
+
+        <label>FolderId</label>
+        <input id="upload_folder_id" value="60e6e52c0a9a80ba7867e331">
+        <br>
+
+        <label>File</label>
+        <input id="upload_file" style="width: 600;" type="file">
+        <br>
+
+    </form>
+    <button id="upload_meta">Meta</button>
+    <button id="upload_chunks">Chunks</button>
+    <button id="upload_finish">Finish</button>
+    <script>
+        let task;
+        $("#upload_meta").on("click", () => {
+            folder = $("#upload_folder_id").val()
+            file = $("#upload_file").prop('files')[0];
+            console.log(folder, file);
+            task = new UploadTask(folder, file)
+            task.postMeta()
+            console.log(task)
+        })
+        $("#upload_chunks").on("click", () => {
+            task.doFileUpload();
+        })
+        $("#upload_finish").on("click", () => {
+            task.postFinish();
+        })
+    </script>
+    <hr>
 </body>
 
 </html>

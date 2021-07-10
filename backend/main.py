@@ -33,11 +33,13 @@ from blueprint.view import view
 
 from blueprint.auth import auth
 from blueprint.file import fs
+from blueprint.io import io
 modules = [
     view,
 
     auth,
     fs,
+    io
 ]
 
 for m in modules:
