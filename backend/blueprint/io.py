@@ -69,7 +69,7 @@ def upload_start_meta():
 
     
 @login_required
-@io.route('/upload/aes_shakehand', methods=['POST', ])
+@io.route('/aes_shakehand', methods=['POST', ])
 def aes_shakehand():
     pass
 

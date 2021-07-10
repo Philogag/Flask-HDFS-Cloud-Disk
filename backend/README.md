@@ -2,22 +2,35 @@
 
 ## 目录
 
-- [Flask 后端](#flask-后端)
-    - [目录](#目录)
-    - [RESTful API](#restful-api)
-        - [GET /hello](#get-hello)
-        - [Auth](#auth)
-            - [状态码概览](#状态码概览)
-            - [POST /auth/login](#post-authlogin)
-            - [GET /auth/check](#get-authcheck)
-            - [GET /auth/logout](#get-authlogout)
-            - [POST /auth/regist](#post-authregist)
-        - [FileSystem](#filesystem)
-            - [状态码概览](#状态码概览-1)
-            - [GET /fs/list](#get-fslist)
-            - [GET /fs/refresh](#get-fsrefresh)
-            - [GET /fs/mkdir?name=\<name\>](#get-fsmkdirnamename)
-            - [GET /fs/cd?id=\<id\>](#get-fscdidid)
+- Flask 后端
+  - 目录
+  - RESTful API
+      - GET /hello
+    - Auth
+      - 状态码概览
+      - POST /auth/login
+      - GET /auth/check
+      - GET /auth/logout
+      - POST /auth/regist
+    - FileSystem
+      - 状态码概览
+      - GET /fs/list
+      - GET /fs/refresh
+      - GET /fs/mkdir?name=\<name\>
+      - GET /fs/cd?id=\<id\>
+      - GET /fs/move?
+      - GET /fs/rename?
+      - GET /fs/delete?
+    - IO (Upload/Download)
+      - fileio.js
+        - class UploadTask(folder_id: str, file: File, use_ase: Boolean)
+          - UploadTask.postMeta()
+          - UploadTask.doFileUpload()
+          - UploadTask.postFinish()
+      - POST /api/io/upload/start
+      - POST /api/io/aes_shakehand （TODO）
+      - POST /api/io/upload/chunk
+      - GET /api/io/upload/finish
 
 ---
 
@@ -241,3 +254,89 @@ Content-Type: application/json
 | type        | 目标类型，文件"file"还是文件夹"folder"                 |
 | id          | 目标id                       |
 | name        | 新名字                       |
+
+#### GET /fs/delete?
+
+| Args | Detial                                 |
+| ---- | -------------------------------------- |
+| type | 目标类型，文件"file"还是文件夹"folder" |
+| id   | 目标id                                 |
+
+
+
+---
+
+### IO (Upload/Download)
+
+前端可以直接使用 static/fileio.js
+
+#### fileio.js
+
+这是一个使用 JavaScript 封装的并发文件上传/下载接口实现，可以直接调用
+
+##### class UploadTask(folder_id: str, file: File, use_ase: Boolean)
+
++ folder_id : 上传目标文件夹
++ file : 上传文件，使用 input 可以选中文件
++ use_ase : 是否使用 AES 加密 （未实现）
+
+###### UploadTask.postMeta()
+
+初始化上任务，预分块，AES密钥验证握手
+
+###### UploadTask.doFileUpload()
+
+基于异步的文件分块上传，文件块大小由后端决定，默认4MB
+
+###### UploadTask.postFinish()
+
+结束上传任务，校验文件总MD5，文件合并，推入hdfs或hbase
+
+
+
+
+
+#### POST /api/io/upload/start
+
++ 初始化上传任务
++ 缓存文件元数据（不直接写入File表中）
+
++ 新建缓存文件夹
++ 准备AES密钥
+
+
+
+#### POST /api/io/aes_shakehand （TODO）
+
++ 前后端 AES 密钥握手校验
+
+
+
+#### POST /api/io/upload/chunk
+
++ 单块文件上传
+
+```http
+Content-Type: multiform/form-data
+
+{
+	"task_id": task id,
+	"meta": {
+	    "id": chunk id,
+	    "size": raw chunk size; when aes, size may bigger.
+	    "md5": md5 of raw chunk
+	},
+	"chunk_data": Blob( raw/aes data , {type: "application/octet-stream"})
+}
+```
+
+#### GET /api/io/upload/finish
+
++ 触发文件块归并
++ 总MD5计算
+
+
+
+| Args    | Detial |
+| ------- | ------ |
+| task_id | 任务ID |
