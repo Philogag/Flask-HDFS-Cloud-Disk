@@ -1,5 +1,12 @@
 #!/bin/bash
 
+url="/apache/hadoop/common/stable2/"
+
+mirrors[1]="https://mirrors.ustc.edu.cn"
+mirrors[1]="https://mirrors.tuna.tsinghua.edu.cn"
+
+fast_mirror=${mirrors[1]}$url
+
 ######################################## Super Echo ###########################################
 IFS=$'\n'
 function echo_center()
@@ -135,9 +142,9 @@ function downloadPackage(){
 
     package_file=`ls . | grep hadoop | grep tar.gz$`
     if [ "$package_file" = "" ]; then
-        get_version=`curl -S http://mirrors.ustc.edu.cn/apache/hadoop/common/stable2/ | grep rat.txt | grep -Eo 'hadoop-[0-9]+(:?\.[0-9]+)*' | head -n 1`
-        echo Download $get_version from https://mirrors.tuna.tsinghua.edu.cn
-        wget http://mirrors.ustc.edu.cn/apache/hadoop/common/stable2/$get_version.tar.gz
+        get_version=`curl -sS $fast_mirror | grep rat.txt | grep -Eo 'hadoop-[0-9]+(:?\.[0-9]+)*' | head -n 1`
+        echo Download $get_version from $fast_mirror
+        wget $fast_mirror$get_version.tar.gz
         package_file=`ls . | grep hadoop | grep tar.gz$`
     fi
     echo Package: $package_file
@@ -283,7 +290,7 @@ function main(){
     setHost
     setSSH
     while true then
-    do 
+    do
         downloadPackage
         releasePackage
         if [ $? == '0' ]; then

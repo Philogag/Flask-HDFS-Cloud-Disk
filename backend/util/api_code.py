@@ -11,9 +11,10 @@ def CodeResponse(code, msg=''):
     return res
 
 class CodeResponseError(Exception):
-    def __init__(self, code, msg):
+    def __init__(self, code, msg, **kargs):
         self.code = code
         self.msg = msg
+        self.kargs = kargs
     def json(self):
         return {"code": self.code, "msg": self.msg}
 
@@ -21,6 +22,10 @@ class CodeResponseError(Exception):
 def handle_code_err(error):
     response = jsonify(error.json(),)
     response.status_code = int(error.code)
+    if error.kargs:
+        for k, vs in error.kargs.items():
+            for v in vs:
+                getattr(response, k)(*v)
     return response
 
 # get built-in 401
