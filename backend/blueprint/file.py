@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, request, jsonify
+from flask import Blueprint, current_app, request, jsonify, session
 from flask_login import login_required, current_user
 
 import os
@@ -13,7 +13,7 @@ BANNED_CHARSET=current_app.config['BANNED_CHARSET'].strip()
 
 def get_current_path():
     try:
-        folder_id = request.cookies.get('current_path_id')
+        folder_id = session.get('current_path_id')
         folder = Folder.objects.get(id=folder_id)
         if folder.owner != current_user.obj:
             raise CodeResponseError(403.10002, 'Permission denied. This is not your folder')
@@ -77,7 +77,7 @@ def cd():
             "code": "200",
             "detial": detial,
         })
-        response.set_cookie('current_path_id', str(folder.id))
+        session['current_path_id'] = str(folder.id)
         return response
     except Folder.DoesNotExist:
         raise CodeResponseError(404.10001, 'Current folder not exist.')

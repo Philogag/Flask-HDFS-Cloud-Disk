@@ -1,4 +1,4 @@
-from flask import Blueprint, current_app, request, jsonify
+from flask import Blueprint, current_app, request, jsonify, session
 from flask_login import login_required, LoginManager, UserMixin, login_user, logout_user, current_user
 
 from util.api_code import CodeResponse, CodeResponseError
@@ -53,7 +53,7 @@ def login():
                 "msg": "Login successfully",
                 "info": userobj.get_info(), 
             })
-            current_path_id = request.cookies.get('current_path_id')
+            current_path_id = session.get('current_path_id')
             current_folder = None
             try:
                 current_folder = Folder.objects.get(id=current_path_id)
@@ -61,7 +61,7 @@ def login():
                     raise "Permission denied."
             except BaseException as e:
                 current_folder = Folder.objects(owner=current_user.obj, isroot=True).first()
-            response.set_cookie('current_path_id', str(current_folder.id))
+            session['current_path_id'] = str(current_folder.id)
             return response
         else:
             return CodeResponse(406.00002, 'Password dose not match.')
@@ -97,7 +97,7 @@ def register():
                 "msg": "Regist successfully.",
                 "info": userobj.get_info(), 
             })
-    response.set_cookie("current_path_id", str(folder.id))
+    session["current_path_id"] = str(folder.id)
     return response
 
 @auth.route('/logout', methods=['GET', ])

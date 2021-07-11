@@ -3,7 +3,7 @@ from datetime import datetime
 
 from model.db import db
 from model.User import User
-from model.ReCycle import RecycleTask
+# from model.ReCycle import RecycleTask
 
 class SavePosition(Enum):
     HDFS = 'hdfs'
