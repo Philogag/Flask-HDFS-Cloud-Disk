@@ -75,7 +75,7 @@ class File(db.Document):
     # 2=CASCADE: 连锁删除
     parent_folder = db.LazyReferenceField(Folder, required=True, reverse_delete_rule = 2)
     owner = db.LazyReferenceField(User, required=True)
-    
+
     # recycle_task = db.LazyReferenceField(RecycleTask, reverse_delete_rule = 2)
     # recycle_ttl  = db.DateTimeField()
     def get_root(self):
@@ -88,7 +88,7 @@ class File(db.Document):
         return {
             "id": str(self.id),
             "name": self.name,
-            "update_time": self.update_time,
+            "upload_time": self.upload_time,
             "size": self.size,
             "md5": self.md5,
         }

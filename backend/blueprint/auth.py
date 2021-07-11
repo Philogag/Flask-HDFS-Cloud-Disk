@@ -2,7 +2,6 @@ from flask import Blueprint, current_app, request, jsonify, session
 from flask_login import login_required, LoginManager, UserMixin, login_user, logout_user, current_user
 
 from util.api_code import CodeResponse, CodeResponseError
-import util.hdfs as hdfs
 
 from model.User import User
 from model.File import Folder
@@ -84,11 +83,6 @@ def register():
         reg_time=datetime.now(),
         last_login=datetime.now()
     ).save()
-    try:
-        hdfs.makehome(userobj.id)
-    except CodeResponseError as e:
-        # User.delete_one(userobj) # regist failed, remove from db
-        raise e
     
     folder = Folder(owner=userobj, name="~", update_time=datetime.now(), isroot=True).save()
     login_user(SessionUser(userobj))

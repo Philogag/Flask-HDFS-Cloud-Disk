@@ -101,12 +101,13 @@ def upload_chunk():
         # data = data[: meta['size']]
         # print(len(data))
 
-        # md5 = hashlib.md5(data).hexdigest()
-        # if md5 != meta['meta']['md5'].supper():
-        #     raise CodeResponseError(406.20005, "Chunk md5 wrong.")
-        print(type(data))
+        md5 = hashlib.md5(data).hexdigest()
+        print(md5)
+        if md5 != meta['md5']:
+            raise CodeResponseError(406.20005, "Chunk md5 wrong.")
+        
         with open(os.path.join("./cache/", str(task.id), "block_" + str(meta['id'])), 'wb+') as f:
-            print(data)
+            # print(data)
             f.write(data)
         
         task.chunk_status[meta['id']] = True
@@ -123,32 +124,61 @@ def upload_chunk():
 # Args:
 #   "task_id": task id,
 #   "md5":     md5 of total file.
+from util.FileThread import FilePush
+
 @login_required
 @io.route('/upload/finish', methods=['GET',])
 def upload_finish():
     try:
         task_id = request.args.get("task_id")
-        
+
         task = UploadTask.objects.get(id=task_id)
+        if not task.on_merge:
+            if False in task.chunk_status :
+                raise CodeResponseError(406.20006, "Lost some chunk!")
+            if task.size >= 16 * 1024 * 1024:
+                task.system = "hdfs" 
+            else:
+                task.system = "hdfs" # All to hdfs ,may be hbase later
+            task.on_merge = True
+            task.merge_status = {
+                "done": False,
+                "success": False,
+            }
+            task.save()
+            subthread = FilePush(
+                task
+            )
+            subthread.start()
+            current_app.thread_map[str(task.id)] = subthread
+            
+        print(task.merge_status)
 
-        if False in task.chunk_status :
-            raise CodeResponseError(406.20006, "Lost some chunk!")
-        
-        realname = os.path.join("./cache/", str(task.id), task.name)
-        with open(realname, 'wb+') as o_f:
-            for i in range(task.chunk_cnt):
-                chunkname = os.path.join("./cache/", str(task.id), "block_" + str(i))
-                with open(chunkname, 'rb+') as i_f:
-                    o_f.write(i_f.read())
-        
-        info = task.get_info()
-        task.delete()
+        status = task.merge_status
 
-        return jsonify({
-            "code": 200,
-            "msg": "Upload task done.",
-            "detial": info,
-        })
+        if status['done'] and status['success']:
+            try:
+                del current_app.thread_map[str(task.id)]
+                cachepath = './cache/' + str(task.id)
+                for f in os.listdir(cachepath):
+                    os.remove(os.path.join(cachepath, f))
+                os.rmdir(cachepath)
+            except BaseException:
+                pass
+            info = task.file.fetch().get_info()
+            # clear caches TODO
+            return jsonify({
+                "code": 200,
+                "msg": "success",
+                "status": status,
+                "file": info,
+            })
+        else:
+            return jsonify({
+                "code": 200,
+                "status": status
+            })
+
     except KeyError:
         raise CodeResponseError(403.20001, 'Args loss. Need name,folder,size at least.')
     except Folder.DoesNotExist:

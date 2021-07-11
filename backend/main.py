@@ -1,7 +1,21 @@
 from flask import Flask, jsonify
 
+from concurrent.futures import ThreadPoolExecutor
+
 ## Config ##
-app = Flask('PocketLibrary_backend')
+class FlaskApp(Flask):
+    def __init__(self, *args, **kwargs):
+        super(FlaskApp, self).__init__(*args, **kwargs)
+        self._create_threadpoll()
+
+    def _create_threadpoll(self):
+        self.thread_map = {}
+    
+    def __del__(self):
+        for k, v in self.thread_map:
+            pass
+    
+app = FlaskApp('PocketLibrary_backend')
 app.app_context().push()
 app.config.from_pyfile('config.py')
 
@@ -20,8 +34,8 @@ app.config['SESSION_KEY_PREFIX'] = 'session:'
 Session(app)
 
 ## HDFS Hello ##
-import util.hdfs as hdfs
-hdfs.hello()
+from util.FileThread import hello as hdfs_hello
+hdfs_hello()
 
 ## Root ##
 @app.route('/api/hello', methods=['GET', ])

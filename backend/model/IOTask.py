@@ -1,7 +1,8 @@
 from model.db import db
 
 from model.User import User
-from model.File import Folder
+from model.File import Folder, File
+from datetime import datetime
 
 class UploadTask(db.Document):
     meta = {
@@ -22,6 +23,11 @@ class UploadTask(db.Document):
     aes_shake_raw = db.StringField()    # 握手明文
     aes_shake_crypto = db.BinaryField() # 握手密文
 
+    on_merge = db.BooleanField()
+    merge_status = db.DictField()
+
+    file = db.LazyReferenceField(File)
+
     chunk_cnt = db.IntField()
     chunk_status = db.ListField(db.BooleanField())
 
@@ -35,3 +41,14 @@ class UploadTask(db.Document):
             "chunk_cnt": self.chunk_cnt,
             "chunk_status": self.chunk_status,
         }
+
+    def File(self):
+        file = File(
+            name = self.name,
+            owner = self.owner,
+            parent_folder = self.folder,
+            size = self.size,
+            upload_time = datetime.now(),
+        )
+        return file
+            
