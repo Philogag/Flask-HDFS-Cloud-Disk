@@ -53,13 +53,13 @@ def login():
                 "msg": "Login successfully",
                 "info": userobj.get_info(), 
             })
-            current_path_id = request.cookies.get('current_path_id')
             current_folder = None
             try:
+                current_path_id = request.cookies.get('current_path_id')
                 current_folder = Folder.objects.get(id=current_path_id)
                 if current_folder.owner.id != current_user.obj.id:
                     raise "Permission denied."
-            except BaseException as e:
+            except BaseException:
                 current_folder = Folder.objects(owner=current_user.obj, isroot=True).first()
             response.set_cookie('current_path_id', str(current_folder.id))
             return response

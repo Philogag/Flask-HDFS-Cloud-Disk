@@ -1,0 +1,137 @@
+@charset "utf-8";
+
+/* login */
+.login-main {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: 350px;
+    margin: 0 auto;
+}
+
+.login-main header {
+    margin-top: 150px;
+    height: 35px;
+    line-height: 35px;
+    font-size: 30px;
+    font-weight: 100;
+    text-align: center;
+}
+
+.login-main header, .login-main form, .login-main form .layui-input-inline {
+    margin-bottom: 15px;
+}
+
+.login-main form .layui-input-inline, .login-main form .layui-input-inline input, .login-main form .layui-input-inline button {
+    width: 100%;
+}
+
+.login-main form .login-btn {
+    margin-bottom: 5px;
+}
+
+
+
+/* tools */
+.fl {
+    float: left;
+}
+
+.fr {
+    float: right;
+}
+
+.none {
+    display: none;
+}
+
+.block {
+    display: block;
+}
+
+.tc {
+    text-align: center;
+}
+
+.max-auto {
+    max-height: 450px;
+    overflow-y: auto;
+}
+
+
+
+/* function */
+
+* {
+    margin: 0;
+    padding: 0;
+}
+
+ul {
+    list-style: none;
+}
+
+header {
+    height: 60px;
+    display: flex;
+    /*里面元素两边对齐*/
+    justify-content: space-between;
+    /*文字居中*/
+    align-items: center;
+    padding-left: 10px;
+}
+
+header > div {
+    font-size: 26px;
+}
+
+/*主体部分*/
+.main {
+    /*浏览器多宽 他就多宽*/
+    width: 100vw;
+    height: calc(100vh - 120px);
+    background-color: lightcoral;
+    display: flex;
+    justify-content: flex-start;
+}
+
+/*左侧导航*/
+.main .left {
+    height: 100%;
+    width: 200px;
+    background-color: #0000FF;
+}
+
+/*右侧导航*/
+.main .right {
+    height: 100%;
+    width: calc(100vw - 200px);
+    background-color: #fff;
+    padding: 5px 10px;
+    /*此元素的内边距和边框不再会增加它的宽度 整体大小不改变*/
+    box-sizing: border-box;
+}
+
+/*input相关*/
+.main .right .my-input-g {
+    display: flex;
+    justify-content: left;
+    align-items: center;
+    margin: 20px 0;
+}
+
+.main .right .my-input-g .my-input {
+    width: 200px;
+    margin-right: 20px;
+}
+
+/*底部*/
+footer {
+    height: 60px;
+    background-color: #000;
+    color: #fff;
+}
+
+

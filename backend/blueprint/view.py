@@ -11,4 +11,17 @@ view = Blueprint('view', __name__, url_prefix='/view',
 def index():
     return render_template('index.html')
 
+# 主界面 
+@view.route("/main", methods=['GET','POST'])
+def view_main():
+    return render_template('function.html')
 
+# 登录界面 
+@view.route("/login", methods=['GET'])
+def view_login():
+    return render_template('login.html')
+
+# 注册界面 
+@view.route("/register", methods=['GET','POST'])
+def view_regist():
+    return render_template('register.html')

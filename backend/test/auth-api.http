@@ -23,7 +23,7 @@ POST {{baseUrl}}/auth/regist
 Content-Type: application/json
 
 {
-    "username": "test1",
+    "username": "philogag",
     "password": "123456",
     "password2": "123456"
 }

@@ -99,6 +99,28 @@
         })
     </script>
     <hr>
+
+    <h3>List</h3>
+    <button id="add">New</button>
+    <div id="buttons">
+        <button class="row" data-id="123">List</button>
+        <button class="row" data-id="234">List</button>
+        <button class="row" data-id="345">List</button>
+        <button class="row" data-id="456">List</button>
+    </div>
+    <script>
+        $("#buttons").on("click", ".row" , (e) => {
+            console.log(e);
+            console.log($(e.target).data("id"))
+        })
+        var i = 10;
+        $("#add").on("click", () => {
+            btn = $('<button class="row">' + i + '</button>')
+            btn.data("id", i);
+            $("#buttons").append(btn);
+            i += 1;
+        })
+    </script>
 </body>
 
 </html>
