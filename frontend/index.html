@@ -4,10 +4,7 @@
 
     <!-- 资源文件不要添加前置\ -->
     <script src="static\js\jquery\jquery.min.js" ></script>
-
-    <!-- Requires By fileio.js -->
-    <script src="static\js\spark-md5.min.js" ></script>
-    <script src="static\fileio.js" ></script>
+    <script src="static\js\webuploader\webuploader.min.js" ></script>
 </head>
 <body>
     <h1>This is a test page.</h1>
@@ -74,14 +71,105 @@
         <input id="upload_folder_id" value="60e6e52c0a9a80ba7867e331">
         <br>
 
-        <label>File</label>
-        <input id="upload_file" style="width: 600;" type="file">
-        <br>
+        <div id="uploader" class="wu-example">
+            <!--用来存放文件信息-->
+            <div id="thelist" class="uploader-list"></div>
+            <div class="btns">
+                <input id="picker" type="File">
+                <button id="start" style="display: none;">点击上传文件</button>
+            </div>
+        </div>
 
     </form>
     <button id="upload_meta">Meta</button>
     <button id="upload_chunks">Chunks</button>
     <button id="upload_finish">Finish</button>
+    <script>
+        function sleep(ms) {
+            return new Promise(resolve => setTimeout(resolve, ms));
+        }
+
+        $("#picker").on("change", (e) => {
+            var files = $(e.target).prop('files')[0];
+            // console.log(files);
+            uploader.addFiles(files);
+        })
+
+        let uploader = WebUploader.create({
+            swf: 'https://cdn.bootcss.com/webuploader/0.1.1/Uploader.swf',
+            auto: true,
+            chunked: true,
+            chunkSize: 4 * 1024 * 1024,
+            chunkRetry: 0,
+            threads: 1,
+            server: '/api/io/upload/chunk',
+        });
+
+        uploader.on('uploadStart', (file) => {
+            // 文件分块传输前自动申请 task_id
+            // 并准备 加密 等
+            file.md5 = uploader.md5File(file)
+            $.ajax({
+                url: "/api/io/upload/start",
+                data: JSON.stringify({
+                    "name": file.name,
+                    "size": file.size,
+                    "folder": $("#upload_folder_id").val(),
+                    "aes": false,
+                }),
+                type: 'post',
+                async: false,
+                contentType: 'application/json',
+                dataType: 'JSON',
+                success: data => {
+                    console.log(data);
+                    if (data.code == 200) {
+                        file.task = data.detial;
+                        // if (false) {
+                        //     self.__aesShakeHand();
+                        // }
+                    }
+                }
+            })
+        })
+
+        uploader.on('uploadBeforeSend', (object, data, headers) => {
+            data.task_id = object.file.task.id;
+            console.log(object, data);
+        })
+
+        uploader.on('uploadSuccess', async (file, response) => {
+            // 触发合并
+            var Done = false;
+            console.log("Check merging.")
+            md5 = await file.md5
+            while (!Done) {
+                await sleep(500)
+                $.ajax({
+                    url: "/api/io/upload/merge",
+                    data: {
+                        "task_id": file.task.id,
+                        "md5": md5
+                    },
+                    type: 'get',
+                    async: false,
+                    success: data => {
+                        if (data.status.done && data.status.success) {
+                            console.log("File Upload Done.")
+                            console.log(data.file);
+                        }
+                        if (data.status.done) {
+                            Done = true;
+                        }
+                        // 此处可以更新合并进度
+                        console.log("Merge finish: " + data.status.merged + '/' + data.status.total)
+                    }
+                })
+            }
+        })
+
+
+    </script>
     <script>
         let task;
         $("#upload_meta").on("click", () => {
@@ -99,7 +187,7 @@
             task.postFinish();
         })
     </script>
-    <hr>
+
 </body>
 
 </html>

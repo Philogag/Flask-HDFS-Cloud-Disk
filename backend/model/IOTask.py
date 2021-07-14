@@ -7,48 +7,68 @@ from datetime import datetime
 class UploadTask(db.Document):
     meta = {
         'indexes': [
-            {'fields': ['create_t'], 'expireAfterSeconds': 7 * 24 * 3600 }
+            {'fields': ['meta_created'], 'expireAfterSeconds': 7 * 24 * 3600 }
         ]
     }
-    create_t = db.DateTimeField(required=True)
+    ## Refrence
     owner = db.LazyReferenceField(User)
-
-    name = db.StringField()
     folder = db.LazyReferenceField(Folder)
-    size = db.LongField()
+    file = db.LazyReferenceField(File)
 
-    # aes加密相关
+    ## Meta
+    meta_created = db.DateTimeField(required=True)
+    meta_chunks = db.IntField()
+    meta_size = db.LongField()
+    meta_name = db.StringField()
+    meta_md5 = db.StringField()
+
+    ### aes加密相关
+    aes_use  = db.BooleanField(default=False)
     aes_key = db.BinaryField()          # 密钥
     aes_shake_hand = db.BooleanField()  # 握手成功标记
     aes_shake_raw = db.StringField()    # 握手明文
-    aes_shake_crypto = db.BinaryField() # 握手密文
+    aes_shake_crypto = db.BinaryField()  # 握手密文
 
-    on_merge = db.BooleanField()
-    merge_status = db.DictField()
+    ### Upload
+    upload_done = db.BooleanField(default=False)
+    upload_chunks = db.ListField(db.BooleanField())
+    
+    ### Merge
+    merge_doing = db.BooleanField(default=False)
+    merge_done = db.BooleanField(default=False)
+    merge_success = db.BooleanField(default=False)
+    merge_count = db.IntField(default=0)
 
-    file = db.LazyReferenceField(File)
+    call_cancle = db.BooleanField(default=False)
 
-    chunk_cnt = db.IntField()
-    chunk_status = db.ListField(db.BooleanField())
-
-    def get_info(self):
+    def get_detial(self):
         return {
             "id": str(self.id),
-            "size": self.size,
-            "name": self.name,
-            "folder": str(self.folder.id),
-            "aes_key": self.aes_key,
-            "chunk_cnt": self.chunk_cnt,
-            "chunk_status": self.chunk_status,
+            "meta": {
+                "created": self.meta_created,
+                "size": self.meta_size,
+                "name": self.meta_name,
+            },
+            "chunks": {
+                "count": self.meta_chunks,
+                "status": self.upload_chunks,
+            },
+            "aes_use": self.aes_use,
+            "aes": {
+                "key": self.aes_key,
+                "shake_hand": self.aes_shake_hand,
+                "shake_crypto": self.aes_shake_crypto
+            }
         }
-
+    
     def File(self):
         file = File(
-            name = self.name,
+            name = self.meta_name,
             owner = self.owner,
             parent_folder = self.folder,
-            size = self.size,
-            upload_time = datetime.now(),
+            size = self.meta_size,
+            upload_time = self.meta_created,
         )
         return file
+
             

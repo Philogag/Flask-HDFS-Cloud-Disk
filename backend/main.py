@@ -34,7 +34,7 @@ app.config['SESSION_KEY_PREFIX'] = 'session:'
 Session(app)
 
 ## HDFS Hello ##
-from util.FileThread import hello as hdfs_hello
+from util.FileThread import hdfs_hello
 hdfs_hello()
 
 ## Root ##
