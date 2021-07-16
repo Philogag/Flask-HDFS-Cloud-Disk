@@ -92,6 +92,7 @@
         $("#picker").on("change", (e) => {
             var files = $(e.target).prop('files')[0];
             // console.log(files);
+            files.folder_id = $("#upload_folder_id").val();
             uploader.addFiles(files);
         })
 
@@ -106,6 +107,7 @@
         });
 
         uploader.on('uploadStart', (file) => {
+            console.log(file);
             // 文件分块传输前自动申请 task_id
             // 并准备 加密 等
             file.md5 = uploader.md5File(file)
@@ -114,7 +116,7 @@
                 data: JSON.stringify({
                     "name": file.name,
                     "size": file.size,
-                    "folder": $("#upload_folder_id").val(),
+                    "folder": file.source.source.folder_id,
                     "aes": false,
                 }),
                 type: 'post',

@@ -95,7 +95,7 @@ class FilePush(threading.Thread):
             self.file.save_position = SavePosition.HBASE
 
         print(self.task.id, "Merge task done.")
-        self.__del__()
+        # self.__del__()
 
 
 def hdfs_read(file, l, r):
