@@ -1,6 +1,13 @@
 
 # 部署手册
 
+> Test Success on Centos 7 
+
+## 0. Prepare 
+
++ 请先安装 Docker-ce 和 docker-compose
++ 请先 Clone 或 下载本仓库
+
 ## 1. 快速部署 HDFS 
 
 使用 install_hdfs.sh 脚本，部署伪分布式Hadoop-hdfs。
@@ -32,39 +39,14 @@ sudo ./install_hdfs.sh
 2058 Jps
 ```
 
----
-
-## 2. 快速部署 HBase
-
-使用 install_hbase.sh 脚本，基于Hadoop部署伪分布式Hbase。
-
-```
-chmod +x ./install_hbase.sh
-sudo ./install_hbase.sh
-```
-
-脚本包含功能：
-+ 检测/安装 JAVA，设置 JAVA_HOME
-+ 下载最新的稳定版 hbase
-+ 配置
-+ 启动集群
-
-**启动Hbase前需启动hdfs**  
-启动 HBase: `./hbase-?/bin/start-hbase.sh`  
-关闭 HBase: `./hbase-?/bin/stop-hbase.sh && hbase-daemon.sh stop regionserver RegionServer`
-
-使用 Jps 查看节点运行状态:
-```shell
-[root@centos ~]# jps
-2404 HQuorumPeer      -> For Hbase
-2564 HMaster          -> For Hbase
-1606 NameNode
-1702 DataNode
-2743 HRegionServer    -> For Hbase
-1833 SecondaryNameNode
-3613 Jps
-```
-
 ----
 
-## 3. 部署后端与数据库
+## 2. 部署后端与数据库
+
+修改 ./deploy/docker-compose.yml 与 ./backend/config.py 中的数据库密码
+
+打开终端  
+cd 到 deploy 文件夹  
+运行 docker-compose up -d
+
+## 3. Enjoy at http://ip:80
