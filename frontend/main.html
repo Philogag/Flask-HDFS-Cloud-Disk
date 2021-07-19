@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="zh">
+
+<head>
+    <meta charset="UTF-8">
+    <title>个人中心</title>
+    <link rel="stylesheet" href="static/js/layui/css/layui.css">
+    <link rel="stylesheet" href="static/js/layui/css/style.css" media="all">
+    <link rel="stylesheet" href="static/icofont/icofont.min.css" media="all">
+    <meta name="renderer" content="webkit">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+    <script src="static/js/jquery/jquery.min.js"></script>
+    <script src="static/js/webuploader/webuploader.min.js"></script>
+</head>
+
+
+<body>
+    <header class="layui-bg-black">
+        <div style="margin-left: 10px;">Web Drive</div>
+        <ul class="layui-nav " lay-filter="">
+
+            <li class="layui-nav-item">
+                <a id="username" href="javascript:;">user</a>
+                <dl class="layui-nav-child layui-bg-blacK">
+                    <!-- 二级菜单 -->
+                    <dd><a href="login">退出</a></dd>
+                    <!--退出登录 -->
+                </dl>
+            </li>
+        </ul>
+    </header>
+    <div style="height: 100%;">
+    <div>
+        <!--主体-->
+        <div class="main">
+            <!-- 左侧导航-->
+            <div class="left layui-bg-black">
+                <ul class="layui-nav layui-nav-tree" lay-filter="test">
+                    <li class="layui-nav-item layui-nav-itemed">
+                        <a class="layui-this">
+                            文件管理<span style="right:16px;" id="nav-select-dot" class="layui-badge-dot layui-bg-orange"></span>
+                        </a>
+                    </li>
+                </ul>
+            </div>
+            <div id="file_list_container" class="layui-container" style="height: 100%;">
+                
+                <div class="layui-row" style="margin-top: 12px;">
+                    <!-- 顶部功能按钮 -->
+                    <input type="file" id="upload_picker" style="display: none;">
+                    <button id="btn_upload" class="layui-btn layui-btn-primary layui-btn-sm" onclick="$('#upload_picker').click()">点击此处或拖拽上传</button>
+                    <button id="btn_new_folder" class="layui-btn layui-btn-primary layui-btn-sm">新建文件夹</button>
+                </div>
+                <div class="layui-row" style="margin-top: 12px;">
+                    <!-- 面包屑 -->
+                    <span id="breadcrumb" class="layui-breadcrumb" lay-separator=">">
+
+                    </span>
+                </div>
+
+                <table id="list_table" 
+                        lay-filter="list_table" 
+                        class="layui-table"  
+                        lay-data="{skin:'line', id:'list_table', height: 'full-160', text: {none: '加载中...'}}">
+                    <thead>
+                    <tr>
+                        <th lay-data="{field:'icon', unresize:true, align:'center', width:'5%', sort:true}"></th>
+                        <th lay-data="{field:'name', unresize:true, width:'60%', sort:true}">文件名</th>
+                        <!-- <th lay-data="{field:'btns', unresize:true, align:'center', width:'15%'}"></th> -->
+                        <th lay-data="{field:'size', unresize:true, align:'center', width:'10%', sort:true}">大小</th>
+                        <th lay-data="{field:'time', unresize:true, align:'center', sort:true}">修改时间</th>
+                    </tr></thead>
+                    <tbody>
+
+                    </tbody>
+                </table>
+            </div>
+            
+            <script type="text/html" id="barDemo">
+
+                <div class="layui-btn-group">
+                    <button type="button" class="layui-btn layui-btn-primary layui-btn-sm demolist" data-id="444">
+                        <i class="layui-icon layui-font-12">&#xe654;</i>
+                    </button>
+    
+                    <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" lay-event="edit">
+                        <i class="layui-icon">&#xe642;</i>
+                    </button>
+                    <button type="button" class="layui-btn layui-btn-primary layui-btn-sm" lay-event="del">
+                        <i class="layui-icon">&#xe640;</i>
+                    </button>
+                </div>
+              
+            </script>
+
+
+        </div>
+    </div>
+    </div>
+    <div style="position:fixed; bottom: 40px; left: 40px;">
+        <button class="layui-btn layui-btn-radius layui-btn-normal"
+            onclick="show_upload_list();"
+            >上传列表</button>
+    </div>
+</body>
+
+
+<!-- 弹窗区 -->
+
+<!-- 上传列表 -->
+<div id="upload_task_view" 
+    style="display: none; height: 100%"
+    >
+    <div id="upload_task_view_container" 
+        style="background-color: #e7e6e6; padding: 30px; min-height: calc(100% - 60px);">
+        
+    </div>
+</div>
+
+<!-- 新建文件夹/重命名文件 -->
+<div id="name_input_view" 
+    style="display: none;"
+    >
+    <div style="padding: 20px;">
+        <input id="name_input_input" type="text" placeholder="请输入名称" class="layui-input">
+    </div>
+</div>
+
+<!-- 右键列表 -->
+<div id="rightmenu-view" 
+    style="display: none;"
+    >
+    <div><button id="rightmenu-btn-rename" class="layui-btn layui-btn-sm layui-btn-fluid layui-btn-primary">重命名</button></div>
+    <div><button id="rightmenu-btn-delete" class="layui-btn layui-btn-sm layui-btn-fluid layui-btn-primary">删除</button></div>
+    <div><button id="rightmenu-btn-download" class="layui-btn layui-btn-sm layui-btn-fluid layui-btn-primary">下载</button></div>
+</div>
+
+
+
+<script src="static/js/layui/layui.js" ></script>
+<link rel="stylesheet" href="static/js/layui/plugin/notice.css">
+<script >
+layui.config({
+    base: 'static/js/layui/plugin/'
+}).extend({
+    notice: 'notice'
+});
+// 加载插件
+let notice;
+let layer;
+layui.use(['notice', 'jquery', 'layer'], function () {
+    notice = layui.notice;
+    layer = layui.layer;
+    var $ = layui.jquery;
+
+    // 初始化配置，同一样式只需要配置一次，非必须初始化，有默认配置
+    notice.options = {
+        closeButton:true,//显示关闭按钮
+        debug:false,//启用debug
+        positionClass:"toast-bottom-right",//弹出的位置,
+        showDuration:"300",//显示的时间
+        hideDuration:"2000",//消失的时间
+        timeOut:"2000",//停留的时间
+        extendedTimeOut:"1000",//控制时间
+        showEasing:"swing",//显示时的动画缓冲方式
+        hideEasing:"linear",//消失时的动画缓冲方式
+        iconClass: 'toast-info', // 自定义图标，有内置，如不需要则传空 支持layui内置图标/自定义iconfont类名
+        onclick: null, // 点击关闭回调
+    };
+});
+let element
+layui.use('element', function(){
+    element = layui.element;
+});
+</script>
+
+<script src="static/js/func/file_list.js"></script>
+<script src="static/js/main.js"></script>
+
+
+
+<div id="ele-template" style="display: none;">
+<!-- 动态元件库 -->
+
+<a id="download-link"><span></span></a>
+
+<!-- 上传列表 任务详细信息 -->
+<div id="upload-task-temp" class="layui-card upload-task-detial">
+    <div class="layui-card-header">Task - xxxx</div>
+    <div class="layui-card-body">
+        <div class="layui-row">
+            <div class="layui-progress layui-progress-big layui-col-md11"
+                style="margin-top: 6px;">
+                <div class="layui-progress-bar layui-bg-blue" 
+                    lay-percent="0%"
+                    ></div>
+            </div>
+            <div class="layui-col-md1">
+                <button 
+                    class="layui-btn layui-btn-radius layui-btn-sm layui-btn-primary"
+                    style="margin-left:20px;"
+                    ><i class="layui-icon layui-icon-close"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+</html>

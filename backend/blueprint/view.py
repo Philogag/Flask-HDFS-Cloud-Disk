@@ -12,3 +12,17 @@ def index():
     return render_template('index.html')
 
 
+@view.route("/register", methods=['GET'])
+def regist_view():
+    return render_template('register.html')
+
+
+@view.route("/login", methods=['GET'])
+def login_view():
+    return render_template('login.html')
+
+
+@view.route("/main", methods=['GET'])
+def main_view():
+    return render_template('main.html')
+

@@ -1,6 +1,10 @@
 #!/bin/bash
 
-urlbase="http://mirrors.ustc.edu.cn/apache/hbase/stable/"
+url="/apache/hbase/stable/"
+
+mirrors[1]="https://mirrors.ustc.edu.cn"
+
+fast_mirror=${mirrors[1]}$url
 
 ######################################## Super Echo ###########################################
 IFS=$'\n'
@@ -83,8 +87,8 @@ function checkJava(){
     javabin=`whereis -b javac | sed 's/ /\n/g ' | grep bin`
     if [ -z "$javabin" ]; then
         echo Java not found.
-        echo "Install java-1.8.0-openjdk"
-        yum install -y java-1.8.0-openjdk
+        echo "Install java-1.8.0-openjdk-devel"
+        yum install -y java-1.8.0-openjdk-devel
         javabin=`whereis -b java | sed 's/ /\n/g ' | grep bin`
     fi
     echo "Locate JAVA_HOME"
