@@ -29,7 +29,7 @@ def list():
     folder = get_current_path()
     detial = folder.get_detial()
     response = jsonify({
-        "code": "200",
+        "code": 200,
         "detial": detial,
     })
     return response
@@ -57,7 +57,7 @@ def mkdir():
     )
     new_folder.save()
     return jsonify({
-        "code": "200",
+        "code": 200,
         "msg": "ok",
         "new_id": str(new_folder.id),
     })
@@ -74,7 +74,7 @@ def cd():
             raise CodeResponseError(403.10002, 'Permission denied. This is not your folder')
         detial = folder.get_detial()
         response = jsonify({
-            "code": "200",
+            "code": 200,
             "detial": detial,
         })
         session['current_path_id'] = str(folder.id)
@@ -176,13 +176,10 @@ def delete():
     if obj.owner != current_user.obj:
         raise CodeResponseError(403.10002, 'Permission denied.')
     if otype == "folder" and obj.isroot:
-        raise CodeResponseError(403.10002, 'Permission denied.User\'s root cannot rename.')
+        raise CodeResponseError(403.10002, 'Permission denied.User\'s root cannot delete.')
     # Do delete
-    info = obj.get_info()
     obj.delete()
 
     return jsonify({
         "code": 200,
-        "msg": "Delete ? folders, ? files. ? MB in total.",
-        "info": info,
     })

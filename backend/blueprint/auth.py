@@ -36,6 +36,11 @@ def load_user(user_id):
 def check():
     return CodeResponse(200, "ok")
 
+@auth.route('/user_info', methods=['GET', ])
+@login_required
+def user_info():
+    return jsonify({ "code": 200, "user": current_user.obj.get_info()})
+
 @auth.route('/login', methods=['POST'])
 def login():
     userlogin = request.get_json()

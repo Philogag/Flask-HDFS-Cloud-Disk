@@ -25,9 +25,9 @@ class Folder(db.Document):
     
     def walk_to_root(self):
         if self.parent_folder is None:
-            return []
+            return [self]
         current = self.parent_folder.fetch()
-        ret = []
+        ret = [self]
         while current and current.name != "~":
             ret.append(current)
             current = current.parent_folder.fetch()
